@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedicEd — Materi Kedokteran Semester 2</title>
+<style>
+:root{--g:rgba(255,255,255,0.07);--b:rgba(255,255,255,0.18);--p:#00f2ff;--s:#a855f7;--a:#ff2e63;--ok:#00e676;--warn:#ffcc00;--bg:linear-gradient(135deg,#0f0c29,#302b63,#24243e);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);background-size:400% 400%;animation:bgMove 20s ease infinite;color:#fff;min-height:100vh;line-height:1.6}
+@keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,242,255,0.35)}50%{box-shadow:0 0 0 18px rgba(0,242,255,0)}}
+.glass{background:var(--g);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--b);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,0.35);animation:fadeIn .5s ease}
+.container{max-width:920px;margin:0 auto;padding:20px}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:999;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:rgba(15,12,41,0.65);backdrop-filter:blur(24px);border-bottom:1px solid var(--b);flex-wrap:wrap;gap:8px}
+.logo{font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(0,242,255,0.2)}
+.nav-links{display:flex;gap:6px;flex-wrap:wrap}
+.nb{padding:7px 14px;border-radius:12px;border:1px solid var(--b);background:rgba(255,255,255,0.04);color:#fff;cursor:pointer;font-size:.78rem;font-weight:500;transition:.25s}
+.nb:hover,.nb.active{background:rgba(0,242,255,0.15);border-color:var(--p);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,242,255,0.15)}
+
+/* Layout */
+.sec{display:none;animation:fadeIn .45s ease;padding-top:86px}
+.sec.active{display:block}
+
+/* Dashboard */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.stat{padding:18px 10px;text-align:center;transition:transform .3s}
+.stat:hover{transform:translateY(-6px)}
+.stat-num{font-size:1.9rem;font-weight:800;color:var(--p);text-shadow:0 0 12px rgba(0,242,255,0.25)}
+.stat-label{font-size:.82rem;opacity:.75;margin-top:4px}
+.dash-welcome{padding:22px}
+.dash-welcome h2{color:var(--p);margin-bottom:10px;font-size:1.25rem}
+.dash-welcome p{opacity:.85;font-size:.95rem}
+
+/* Search & Materi */
+.search{width:100%;padding:14px 18px;margin-bottom:18px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:14px;color:#fff;font-size:1rem;outline:none;transition:.3s}
+.search:focus{border-color:var(--p);box-shadow:0 0 18px rgba(0,242,255,0.15)}
+.topic{margin-bottom:16px;overflow:hidden;transition:.3s}
+.topic-head{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);border-bottom:1px solid transparent;transition:.25s}
+.topic-head:hover{background:rgba(0,242,255,0.08);border-bottom-color:rgba(0,242,255,0.15)}
+.topic-head h3{font-size:1.05rem;font-weight:700}
+.topic-head small{display:block;font-size:.75rem;opacity:.6;margin-top:2px;font-weight:400}
+.topic-body{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s ease;padding:0 20px}
+.topic-body.open{max-height:3000px;padding:18px 20px 22px}
+.simple{background:rgba(0,230,118,0.08);border-left:3px solid var(--ok);padding:12px 14px;margin:12px 0;border-radius:0 10px 10px 0;font-size:.92rem}
+.simple strong{color:var(--ok)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:600;background:rgba(168,85,247,0.15);color:#e0c3fc;border:1px solid rgba(168,85,247,0.3);margin-bottom:10px}
+
+/* Flashcard */
+.fc-wrap{text-align:center;margin-bottom:18px}
+.fc-wrap h2{color:var(--p);font-size:1.3rem}
+.fc-wrap p{opacity:.75;font-size:.88rem;margin-top:4px}
+.fc-scene{perspective:1000px;margin:18px 0;cursor:pointer}
+.fc-card{width:100%;min-height:170px;position:relative;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.4,.2,.2,1)}
+.fc-card.flip{transform:rotateY(180deg)}
+.fc-front,.fc-back{position:absolute;width:100%;min-height:170px;backface-visibility:hidden;padding:22px;border-radius:18px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.fc-front{background:rgba(0,242,255,0.08);border:1px solid rgba(0,242,255,0.25)}
+.fc-back{background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.35);transform:rotateY(180deg)}
+.fc-front .q{font-size:1.15rem;font-weight:600}
+.fc-front .n{font-size:.75rem;opacity:.5;margin-bottom:10px}
+.fc-back .a{font-size:1.05rem;line-height:1.55}
+.fc-ctrl{text-align:center;margin-top:10px}
+
+/* Pomodoro */
+.pomo-box{text-align:center;padding:34px 24px;margin-top:10px}
+.pomo-timer{font-size:4.2rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;text-shadow:0 0 30px rgba(0,242,255,0.4);animation:pulse 2.5s infinite}
+.pomo-label{margin:12px 0 22px;font-size:1.05rem;opacity:.9}
+.pomo-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{padding:11px 26px;border-radius:12px;border:none;font-weight:600;cursor:pointer;transition:.25s;font-size:.95rem}
+.btn-prim{background:linear-gradient(135deg,var(--p),var(--s));color:#0b0b1a}
+.btn-ok{background:var(--ok);color:#0b0b1a}
+.btn-dang{background:var(--a);color:#fff}
+.btn:hover{transform:scale(1.04);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.pomo-modes{display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.pomo-stat{margin-top:22px;padding:14px;background:rgba(0,0,0,.2);border-radius:12px;display:inline-block;min-width:140px}
+.pomo-stat div{font-size:1.4rem;font-weight:700;color:var(--ok)}
+.pomo-stat span{font-size:.78rem;opacity:.7}
+
+/* Quiz & Exam */
+.qz-progress{height:5px;background:rgba(255,255,255,.08);border-radius:3px;margin-bottom:18px;overflow:hidden}
+.qz-bar{height:100%;background:linear-gradient(90deg,var(--p),var(--ok));width:0%;transition:width .35s}
+.qz-card{padding:22px;margin-bottom:16px}
+.qz-meta{font-size:.78rem;opacity:.55;margin-bottom:10px}
+.qz-q{font-size:1.08rem;font-weight:600;margin-bottom:16px;line-height:1.5}
+.opt{padding:13px 16px;margin:8px 0;border-radius:12px;border:1px solid var(--b);background:rgba(255,255,255,.025);cursor:pointer;transition:.2s;font-size:.97rem}
+.opt:hover{background:rgba(0,242,255,.08);border-color:var(--p);transform:translateX(6px)}
+.opt.correct{background:rgba(0,230,118,.15);border-color:var(--ok)}
+.opt.wrong{background:rgba(255,46,99,.15);border-color:var(--a)}
+.expl{margin-top:14px;padding:14px;background:rgba(255,255,255,.04);border-radius:10px;border-left:3px solid var(--warn);display:none;font-size:.92rem;line-height:1.5}
+.expl strong{color:var(--warn)}
+.qz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+.qz-result{text-align:center;padding:30px}
+.qz-result h2{color:var(--ok);margin-bottom:10px}
+
+/* Exam timer */
+.exam-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.exam-timer{font-weight:700;color:var(--warn);font-variant-numeric:tabular-nums;font-size:1.1rem;background:rgba(255,204,0,.1);padding:6px 14px;border-radius:10px;border:1px solid rgba(255,204,0,.25)}
+
+/* References */
+.ref-list{list-style:none}
+.ref-list li{padding:12px 14px;margin:8px 0;border-left:2px solid var(--p);background:rgba(255,255,255,.03);border-radius:0 10px 10px 0;font-size:.9rem;opacity:.92}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.03)}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}
+
+@media(max-width:640px){
+  .pomo-timer{font-size:3rem}
+  .nav{justify-content:center}
+  .logo{width:100%;text-align:center;margin-bottom:8px}
+  .dash-grid{grid-template-columns:repeat(2,1fr)}
+  .nb{padding:6px 10px;font-size:.72rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">💊 MedicEd</div>
+  <div class="nav-links">
+    <button class="nb active" onclick="go('dashboard')">Dashboard</button>
+    <button class="nb" onclick="go('materi')">Materi</button>
+    <button class="nb" onclick="go('flashcard')">Flashcard</button>
+    <button class="nb" onclick="go('kuis')">Kuis</button>
+    <button class="nb" onclick="go('ujian')">Simulasi Ujian</button>
+    <button class="nb" onclick="go('pomodoro')">Pomodoro</button>
+    <button class="nb" onclick="go('referensi')">Referensi</button>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="sec active">
+  <div class="dash-grid">
+    <div class="glass stat"><div class="stat-num">7</div><div class="stat-label">Topik Materi</div></div>
+    <div class="glass stat"><div class="stat-num" id="dFlash">0</div><div class="stat-label">Flashcard</div></div>
+    <div class="glass stat"><div class="stat-num" id="dQuiz">0</div><div class="stat-label">Kuis Dijawab</div></div>
+    <div class="glass stat"><div class="stat-num" id="dAcc">0%</div><div class="stat-label">Akurasi</div></div>
+    <div class="glass stat"><div class="stat-num" id="dTime">0m</div><div class="stat-label">Waktu Belajar</div></div>
+    <div class="glass stat"><div class="stat-num" id="dStreak">1</div><div class="stat-label">Streak</div></div>
+  </div>
+  <div class="glass dash-welcome">
+    <h2>📚 Selamat Datang di MedicEd</h2>
+    <p>Platform ringkas untuk mahasiswa kedokteran semester 2. Gunakan <strong>Flashcard</strong> untuk hafalan cepat, <strong>Kuis</strong> untuk uji pemahaman, <strong>Simulasi Ujian</strong> untuk latihan timed, dan <strong>Pomodoro</strong> untuk manajemen waktu belajar.</p>
+  </div>
+</section>
+
+<!-- MATERI -->
+<section id="materi" class="sec">
+  <input class="search glass" id="src" placeholder="🔍 Cari materi (contoh: imun, farmako, neoplasia, inflamasi...)" oninput="doSearch()">
+  <div id="box"></div>
+</section>
+
+<!-- FLASHCARD -->
+<section id="flashcard" class="sec">
+  <div class="fc-wrap">
+    <h2>🎴 Flashcard Interaktif</h2>
+    <p>Klik kartu untuk membalik • Pelajari 20 kartu penting</p>
+  </div>
+  <div id="fcBox"></div>
+  <div class="fc-ctrl">
+    <button class="btn btn-prim" onclick="nextFc()">⏭ Berikutnya</button>
+    <div style="margin-top:10px;font-size:.85rem;opacity:.6" id="fcCount">1 / 20</div>
+  </div>
+</section>
+
+<!-- KUIS -->
+<section id="kuis" class="sec">
+  <div class="qz-progress"><div class="qz-bar" id="qBar"></div></div>
+  <div id="qBox"></div>
+</section>
+
+<!-- UJIAN -->
+<section id="ujian" class="sec">
+  <div class="exam-top">
+    <div class="qz-progress" style="flex:1;margin-right:0"><div class="qz-bar" id="eBar"></div></div>
+    <div class="exam-timer" id="eTimer">30:00</div>
+  </div>
+  <div id="eBox"></div>
+</section>
+
+<!-- POMODORO -->
+<section id="pomodoro" class="sec">
+  <div class="glass pomo-box">
+    <h2 style="color:var(--p);margin-bottom:6px">🍅 Pomodoro Timer</h2>
+    <div class="pomo-timer" id="pTime">25:00</div>
+    <div class="pomo-label" id="pLabel">Waktu Fokus • Sesi Kerja</div>
+    <div class="pomo-btns">
+      <button class="btn btn-ok" onclick="startPomo()">▶ Mulai</button>
+      <button class="btn btn-dang" onclick="pausePomo()">⏸ Jeda</button>
+      <button class="btn btn-prim" onclick="resetPomo()">🔄 Reset</button>
+    </div>
+    <div class="pomo-modes">
+      <button class="nb" onclick="setPomo(25,'Fokus')">Pomodoro 25</button>
+      <button class="nb" onclick="setPomo(5,'Istirahat')">Istirahat 5</button>
+      <button class="nb" onclick="setPomo(15,'Istirahat Panjang')">Panjang 15</button>
+    </div>
+    <div class="pomo-stat">
+      <div id="pSess">0</div>
+      <span>Sesi Selesai Hari Ini</span>
+    </div>
+  </div>
+</section>
+
+<!-- REFERENSI -->
+<section id="referensi" class="sec">
+  <div style="margin-top:10px">
+    <h2 style="color:var(--p);margin-bottom:16px;font-size:1.25rem">📖 Referensi & Sumber</h2>
+    <ul class="ref-list">
+      <li>Marhami Iskandar, Mirna. <em>Dasar-Dasar Sistem Imun</em>. FKIK UNJA, 2025.</li>
+      <li>Dewi, Hasna. <em>Limfadenopati Non Neoplastik</em>. Bagian Histo-Patologi FKIK UNJA, 2026.</li>
+      <li>Lipinwati. <em>Diagnostik Mikrobiologi Klinik</em>. Prodi Kedokteran FKIK UNJA, 2026.</li>
+      <li>Rahman, Ave Olivia. <em>Farmakokinetik</em>. Bagian Farmakologi FKIK UNJA, 2026.</li>
+      <li>Quzwain, Fairuz. <em>Inflammation and Repair</em>. Bagian Patologi Anatomi FKIK UNJA.</li>
+      <li>Quzwain, Fairuz. <em>Neoplasia</em>. Bagian Patologi Anatomi FKIK UNJA, 2023.</li>
+      <li>Siregar, Mara Imam Taufiq. <em>Pengantar Farmakologi</em>. Dept. of Pharmacology & Therapeutic, Universitas Jambi.</li>
+    </ul>
+  </div>
+</section>
+
+</div>
+
+<script>
+/* ================= DATA ================= */
+const topics=[
+{id:1,cat:"Imunologi",title:"Dasar-Dasar Sistem Imun",simple:"Sistem imun adalah 'tentara' tubuh. Ada tentara umum (makrofag) dan tentara khusus (sel B dan T). B membuat antibodi, T membunuh sel terinfeksi. Kalau salah sasaran = alergi/autoimun. Kalah lemah = mudah sakit.",html:`<span class="badge">Imunologi</span><h3>Konsep Imunitas</h3><p>Kemampuan sistem imun memberikan respon terhadap patogen tertentu agar tidak menyebabkan penyakit.</p><h3>Karakteristik</h3><ul><li>Alami (innate) dan Adaptif</li><li>Memori imun (vaksinasi)</li><li>Mencakup inflamasi</li></ul><h3>Tiga Proses Respon</h3><p><b>1. Alami (0–4 jam):</b> Makrofag memfagositosis antigen → APC → T-helper = diferensiasi sel T naif.</p><p><b>2. Awal (4–96 jam):</b> Rekrutmen sel efektor.</p><p><b>3. Adaptif (>96 jam):</b> Limfosit B dan T matur, diferensiasi, memori.</p><h3>Humoral vs Seluler</h3><p><b>Humoral:</b> Sel B → sel plasma → antibodi (IgG, IgE, IgM). Ag-Ab complex.</p><p><b>Seluler:</b> Sel T. CD8+ = cytotoxic (killer). CD4+ = helper (sitokin).</p><h3>Abnormalitas</h3><ul><li><b>Hipersensitivitas:</b> IgE → mast cell → histamin → anafilaksis.</li><li><b>Autoimun:</b> SLE, DM Tipe 1, RA, MS.</li><li><b>Immunodeficiency:</b> HIV menurunkan CD4+.</li></ul>`},
+{id:2,cat:"Patologi",title:"Limfadenopati Non Neoplastik",simple:"Pembesaran kelenjar getah bening (KGB) yang BUKAN karena kanker. Bisa karena infeksi, autoimun, atau inflamasi kronik. Perhatikan ukuran, lokasi, konsistensi, dan gejala B (demam, keringat malam, BB turun).",html:`<span class="badge">Patologi Anatomi</span><h3>Definisi</h3><p>Pembesaran KGB akibat reaktif non-malignan. Organ limfoid sekunder: KGB, limpa, MALT.</p><h3>Pendekatan Klinis</h3><ul><li><b>Usia:</b> Anak sering reaktif; dewasa curiga neoplasma.</li><li><b>Ukuran:</b> Servikal/aksila &lt;1 cm, inguinal &lt;1,5 cm. &gt;2 cm curiga.</li><li><b>Lokasi:</b> Supraklavikular = red flag (curiga malignansi/TB).</li><li><b>Konsistensi:</b> Lunak mobile = jinak; keras fixed = curiga.</li><li><b>B symptoms:</b> Demam, keringat malam, BB turun → curiga TB/limfoma.</li></ul><h3>Pola Histologi</h3><ul><li><b>Follicular hyperplasia:</b> B-cell, germinal center aktif, starry-sky.</li><li><b>Paracortical hyperplasia:</b> T-cell, EBV, dermatopathic.</li><li><b>Sinus histiocytosis:</b> Makrofag di sinus, Rosai-Dorfman.</li><li><b>Granulomatous:</b> TB (caseous necrosis, Langhans giant cell), sarcoidosis.</li></ul>`},
+{id:3,cat:"Mikrobiologi",title:"Diagnostik Mikrobiologi Klinik",simple:"Cara mendeteksi kuman penyebab infeksi. Kunci: ambil sampel SEBELUM antibiotik, dari lokasi yang tepat, dalam wadah steril, dan kirim cepat. Ada pewarnaan Gram, AFB, kultur, dan uji kepekaan antibiotik.",html:`<span class="badge">Mikrobiologi</span><h3>Definisi Infeksi</h3><p>Penyakit oleh mikroorganisme patogen: bakteri, virus, jamur, parasit.</p><h3>Langkah Pemeriksaan</h3><ol><li>Kumpulkan sampel jaringan/cairan</li><li>Pemeriksaan langsung (Gram, AFB, KOH, mikroskop)</li><li>Kultur & identifikasi</li><li>Tes biokimia & genetik</li><li>Uji imuno & serologi</li><li>Uji kerentanan antimikroba</li></ol><h3>Syarat Spesimen Baik</h3><ul><li>Diambil <b>sebelum</b> pemberian antibiotik</li><li>Lokasi representatif, volume cukup</li><li>Wadah steril, bebas bocor, label lengkap</li><li>Kirim secepatnya; CSF tidak boleh ditunda</li></ul><h3>Teknik Pengambilan Urin</h3><ul><li><b>Midstream:</b> Bersihkan dulu, buang awal, tampung tengah.</li><li><b>Kateter:</b> Klem distal, ambil 5 cm dari port.</li><li><b>Suprapubik:</b> Gold standard, kandung kemih penuh, aspirasi aseptis.</li></ul>`},
+{id:4,cat:"Farmakologi",title:"Farmakokinetik (ADME)",simple:"Nasib obat dalam tubuh: masuk (Absorpsi), beredar (Distribusi), diubah (Metabolisme di hati), dan dibuang (Ekskresi via ginjal).",html:`<span class="badge">Farmakologi</span><h3>ADME</h3><ul><li><b>A</b>bsorpsi: dari tempat pemberian ke darah.</li><li><b>D</b>istribusi: ke jaringan target.</li><li><b>M</b>etabolisme: di hati (CYP450) menjadi lebih polar.</li><li><b>E</b>kskresi: ginjal, empedu, dll.</li></ul><h3>Faktor Absorpsi</h3><p>Luas permukaan, aliran darah, waktu kontak, lipofilisitas, pengosongan lambung.</p><h3>First Pass Metabolism</h3><p>Obat oral melewati hati via vena porta sebelum sirkulasi sistemik. Sublingual & IV menghindari ini.</p><h3>Distribusi</h3><p>Vd, ikatan protein plasma, blood brain barrier, sawar uri (kehamilan).</p><h3>Metabolisme</h3><ul><li><b>Fase I:</b> Oksidasi/reduksi/hidrolisis (CYP450).</li><li><b>Fase II:</b> Konjugasi (glukuronidasi, sulfasi, GSH).</li></ul><h3>Kurva & Istilah</h3><ul><li><b>T1/2:</b> Waktu paruh.</li><li><b>Cmax:</b> Kadar puncak.</li><li><b>Tmax:</b> Waktu ke puncak.</li><li><b>Steady state:</b> 4–5 × T1/2.</li><li><b>Bioavailabilitas:</b> Fraksi obat masuk sirkulasi sistemik.</li></ul>`},
+{id:5,cat:"Patologi",title:"Inflammation and Repair",simple:"Radang adalah repons tubuh terhadap infeksi/luka. Tanda: merah, bengkak, panas, nyeri, gangguan fungsi. Bisa sembuh total, jaringan parut, atau menjadi kronik.",html:`<span class="badge">Patologi</span><h3>Cardinal Signs</h3><p>Rubor (merah), Tumor (bengkak), Calor (panas), Dolor (nyeri), Functio laesa (gangguan fungsi).</p><h3>Acute Inflammation</h3><ul><li>Vasodilatasi → stasis</li><li>↑ permeabilitas → edema</li><li>Emigrasi leukosit: neutrofil dominan</li></ul><h3>Mediators</h3><p>Histamine, prostaglandin (COX), leukotriene, complement (C3a, C5a), cytokines (IL-1, TNF).</p><h3>Chronic Inflammation</h3><p>Makrofag, limfosit, plasma cells, angiogenesis, fibrosis.</p><h3>Granulomatous</h3><p>Epitelioid cells, Langhans giant cells, caseous necrosis → TB.</p><h3>Repair</h3><ul><li><b>Regeneration:</b> jaringan kembali normal.</li><li><b>Scar:</b> granulation tissue → remodeling kolagen.</li><li><b>First intention:</b> luka bersih, tepi rapat.</li><li><b>Second intention:</b> luka besar, kontraksi.</li></ul>`},
+{id:6,cat:"Patologi",title:"Neoplasia",simple:"Neoplasma = pertumbuhan baru. Bisa jinak (benign) atau ganas (malignant). Ciri ganas: tumbuh cepat, invasi, metastasis. Penyebab: genetik + lingkungan (rokok, virus, radang kronik).",html:`<span class="badge">Patologi</span><h3>Definisi</h3><p>Neoplasia = new growth. Tumor = neoplasm. Onkologi = studi tumor.</p><h3>Benign vs Malignant</h3><table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:.92rem"><tr style="border-bottom:1px solid rgba(255,255,255,.1)"><th style="text-align:left;padding:8px">Ciri</th><th style="text-align:left;padding:8px">Jinak</th><th style="text-align:left;padding:8px">Ganas</th></tr><tr><td style="padding:8px">Pertumbuhan</td><td style="padding:8px">Lambat</td><td style="padding:8px">Cepat</td></tr><tr><td style="padding:8px">Batas</td><td style="padding:8px">Terkapsul</td><td style="padding:8px">Infiltratif</td></tr><tr><td style="padding:8px">Metastasis</td><td style="padding:8px">Tidak</td><td style="padding:8px">Ya</td></tr></table><h3>Nomenklatur</h3><ul><li>Jinak: fibroma, adenoma, papilloma, chondroma.</li><li>Ganas: karsinoma (epitel), sarkoma (mesenkim).</li><li>Teratoma: multi germ layer. Hamartoma: disorganisasi.</li></ul><h3>Hallmarks of Cancer</h3><ol><li>Self-sufficiency growth signals (onkogen)</li><li>Insensitivity to inhibitory signals (tumor suppressor RB, TP53)</li><li>Evasion apoptosis</li><li>Limitless replication (telomerase)</li><li>Sustained angiogenesis (VEGF)</li><li>Invasion & metastasis</li><li>Altered metabolism (Warburg effect)</li><li>Evasion immune response</li></ol><h3>Staging vs Grading</h3><p><b>Grading:</b> tingkat diferensiasi sel.<br><b>Staging:</b> ukuran, penyebaran lokal, nodus, metastasis (TNM).</p>`},
+{id:7,cat:"Farmakologi",title:"Pengantar Farmakologi",simple:"Farmakologi = ilmu obat. Ada farmakokinetik (nasib obat di tubuh) dan farmakodinamik (efek obat pada tubuh). Obat bekerja via reseptor (agonis/antagonis).",html:`<span class="badge">Farmakologi</span><h3>Ruang Lingkup</h3><ul><li><b>Farmakokinetik:</b> ADME (nasib obat).</li><li><b>Farmakodinamik:</b> mekanisme kerja, reseptor, efek.</li><li><b>Toksikologi:</b> efek racun.</li><li><b>Farmakoterapi:</b> penggunaan obat untuk penyakit.</li></ul><h3>Reseptor Obat</h3><p>Makromolekul target. Agonis = aktifkan reseptor. Antagonis = blokir reseptor.</p><ul><li><b>Agonis parsial:</b> efek maksimal lebih rendah.</li><li><b>Antagonis kompetitif:</b> bersaing di situs sama.</li><li><b>Antagonis non-kompetitif:</b> ikat situs lain.</li></ul><h3>Istilah Penting</h3><ul><li><b>Efikasi:</b> respon maksimal obat.</li><li><b>Potensi:</b> dosis untuk respon tertentu.</li><li><b>Indeks terapi:</b> rasio dosis toksis / dosis efektif.</li></ul><h3>Rute Pemberian</h3><p>IV (100%), IM, SC, oral, sublingual (hindari first pass), inhalasi, transdermal, topikal.</p><h3>Uji Klinik</h3><ol><li><b>Fase I:</b> Keamanan pada manusia sehat.</li><li><b>Fase II:</b> Efek farmakologis pada pasien kecil.</li><li><b>Fase III:</b> Efektivitas vs placebo/standar (500+).</li><li><b>Fase IV:</b> Post-marketing surveillance.</li></ol>`}
+];
+
+const quiz=[
+{q:"Apa singkatan dari ADME?",o:["Absorpsi-Distribusi-Metabolisme-Ekskresi","Asidosis-Diuresis-Metabolisme-Endokrin","Alergi-Distribusi-Migrasi-Eliminasi","Adrenalin-Dopamin-Metanefrin-Epinefrin"],a:0,x:"ADME adalah Absorpsi, Distribusi, Metabolisme, dan Ekskresi — perjalanan obat dalam tubuh."},
+{q:"Sel mana yang memproduksi antibodi?",o:["Sel T helper","Sel B / Sel Plasma","Makrofag","Neutrofil"],a:1,x:"Sel B yang diferensiasi menjadi sel plasma memproduksi antibodi (imunoglobulin)."},
+{q:"Tanda kardinal inflamasi yang berarti NYERI adalah?",o:["Rubor","Tumor","Calor","Dolor"],a:3,x:"Dolor = nyeri. Rubor=merah, Tumor=bengkak, Calor=panas."},
+{q:"Rute pemberian obat dengan bioavailabilitas 100%?",o:["Oral","Intramuskular","Intravena","Subkutan"],a:2,x:"Intravena langsung masuk sirkulasi sistemik tanpa proses absorpsi, sehingga bioavailabilitas 100%."},
+{q:"Sel T mana yang berfungsi sebagai 'killer cell'?",o:["CD4+ Helper","CD8+ Cytotoxic","CD19+ B cell","CD56+ NK"],a:1,x:"CD8+ Cytotoxic T cell membunuh sel yang terinfeksi atau tumor."},
+{q:"Granuloma dengan caseous necrosis paling khas untuk?",o:["Sarcoidosis","Tuberkulosis","Krohn","Sifilis"],a:1,x:"TB menunjukkan granuloma dengan nekrosis kaseus dan Langhans giant cells."},
+{q:"Fase metabolisme yang melibatkan konjugasi (glukuronidasi)?",o:["Fase I","Fase II","Fase III","Fase IV"],a:1,x:"Fase II = reaksi konjugasi dengan senyawa endogen (UDP-glucuronic acid, GSH, sulfat)."},
+{q:"Tumor jinak yang berasal dari jaringan fibrous disebut?",o:["Fibroma","Fibrosarkoma","Adenoma","Papilloma"],a:0,x:"Benign tumor dari fibrous tissue = fibroma. Bila ganas = fibrosarcoma."},
+{q:"Rute sublingual menghindari fenomena?",o:["First pass metabolism","Enterohepatic circulation","Gastrointestinal absorption","Plasma protein binding"],a:0,x:"Sublingual melewati hati pertama kali (first pass) karena masuk vena cava superior langsung."},
+{q:"Uji klinik Fase III bertujuan untuk?",o:["Uji keamanan pertama kali","Lihat efek farmakologis","Memastikan obat berkhasiat","Pantau pasca pemasaran"],a:2,x:"Fase III membandingkan efektivitas obat vs placebo/standar pada ratusan sampel."}
+];
+
+const exam=[
+{q:"MHC Class I diekspresikan pada?",o:["Hanya sel imun","Semua sel bernukleus","Hanya sel B","Hanya sel T"],a:1,x:"MHC I pada semua sel bernukleus; MHC II pada APC (makrofag, dendritik, B, T)."},
+{q:"Apa fungsi utama C3b dalam komplemen?",o:["Anafilatoksin","Opsonin","Chemotaksis","Lisis sel"],a:1,x:"C3b berfungsi sebagai opsonin yang memfasilitasi fagositosis."},
+{q:"Limfadenopati supraklavikular kanan curiga?",o:["Kanker testis","Kanker lambung/TB","Limfoma hodgkin","Infeksi gigi"],a:1,x:"Supraklavikular = red flag; kanan curiga kanker lambung/paru atau TB."},
+{q:"Pemeriksaan gold standard untuk urine steril?",o:["Urine midstream","Urine kateter","Suprapubic aspirasi","Urine spot"],a:2,x:"Suprapubic aspirasi adalah gold standard untuk menghindari kontaminasi flora distal."},
+{q:"Enzim utama metabolisme fase I di hati?",o:["UDP-glukuronosiltransferase","CYP450","Glutathione S-transferase","Sulfotransferase"],a:1,x:"Cytochrome P450 (CYP450) adalah enzim utama fase I (oksidasi)."},
+{q:"Prostaglandin disintesis dari asam arakhidonat oleh?",o:["Lipoxygenase","Cyclooxygenase (COX)","Phospholipase C","Monoamine oxidase"],a:1,x:"COX mengubah AA menjadi prostaglandin. NSAID bekerja menghambat COX."},
+{q:"Dysplasia epithelial full thickness tanpa invasi disebut?",o:["Carcinoma in situ","Metaplasia","Hiperplasia","Anaplasia"],a:0,x:"Carcinoma in situ = dysplasia melibatkan seluruh lapisan tapi belum menembus basement membrane."},
+{q:"Tumor suppressor gene yang disebut Guardian of the Genome?",o:["RB","TP53","BRCA1","APC"],a:1,x:"TP53 mengatur siklus sel, repair DNA, dan apoptosis. Paling sering mutasi pada kanker manusia."},
+{q:"Obat asam lemah dengan pKa 4,4 akan terionisasi dominan di?",o:["Lambung (pH 1,4)","Plasma (pH 7,4)","Urin asam (pH 5)","Urin basa (pH 8)"],a:1,x:"Rumus Henderson-Hasselbalch: di pH 7,4 obat asam lemah akan terionisasi dominan (A-)."},
+{q:"Kadar obat tunak (steady state) tercapai setelah?",o:["1 × T1/2","2 × T1/2","3 × T1/2","4–5 × T1/2"],a:3,x:"Steady state dicapai setelah 4–5 kali waktu paruh obat."},
+{q:"Sel yang dominan pada chronic inflammation?",o:["Neutrofil","Makrofag","Eosinofil","Basofil"],a:1,x:"Makrofag adalah sel dominan chronic inflammation, disertai limfosit dan plasma cells."},
+{q:"Apa yang memicu demam pada inflamasi sistemik?",o:["Histamin","IL-1 dan TNF → PGE2","C3a","IgE"],a:1,x:"Sitokin IL-1 dan TNF merangsang hipotalamus memproduksi PGE2 yang menaikkan set point suhu."},
+{q:"Hipersensitivitas tipe I (alergi) dimediasi oleh?",o:["IgG","IgE","IgM","IgA"],a:1,x:"IgE berikatan pada sel mast → degranulasi → histamin → reaksi alergi/anafilaksis."},
+{q:"Nekrosis yang berwarna keju (cheesy) pada TB disebut?",o:["Liquefaktif","Kaseus","Koagulatif","Gangren"],a:1,x:"Caseous necrosis = nekrosis kaseus, khas tuberkulosis."},
+{q:"Agonis parsial adalah obat yang?",o:["Menghambat reseptor sepenuhnya","Mengaktifkan reseptor dengan efek maksimal rendah","Berikatan tanpa efek","Menghambat enzim"],a:1,x:"Partial agonist mengaktifkan reseptor tapi efek maksimalnya lebih rendah dari agonis penuh."},
+{q:"Faktor yang paling mempengaruhi distribusi obat ke otak?",o:["Ukuran molekul","Blood Brain Barrier","pKa","Berat molekul"],a:1,x:"BBB membatasi masuknya obat hidrofilik/bermuatan ke otak."},
+{q:"Pada pemeriksaan Gram, bakteri Gram positif berwarna?",o:["Merah","Ungu","Pink","Biru-ungu"],a:3,x:"Gram positif = ungu/biru-violet karena menahan kristal violet. Gram negatif = merah/safranin."},
+{q:"Toleransi terhadap morfin disebabkan oleh?",o:["Alergi","Metabolisme cepat","Down-regulasi reseptor / adaptasi neural","Absorpsi buruk"],a:2,x:"True tolerance: adaptasi reseptor atau peningkatan metabolisme obat."},
+{q:"Healing by first intention terjadi pada?",o:["Luka besar dengan jaringan hilang","Luka bersih dengan tepi rapat (insisi bedah)","Ulser kronik","Abses terbuka"],a:1,x:"First intention = luka bersih, tepi rapat, minimal regenerasi + sedikit scar."},
+{q:"Indikasi forced alkaline diuresis?",o:["Keracunan amphetamine","Keracunan salisilat / phenobarbitone","Keracunan quinine","Keracunan asam kuat"],a:1,x:"Alkalinisasi urin (NaHCO3) meningkatkan ekskresi obat asam lemah seperti salisilat dan phenobarbitone."}
+];
+
+const fcs=[
+{q:"ADME",a:"Absorpsi – Distribusi – Metabolisme – Ekskresi (perjalanan obat dalam tubuh)."},
+{q:"MHC / HLA",a:"Major Histocompatibility Complex. Di manusia = Human Leukocyte Antigen. MHC I = semua sel bernukleus; MHC II = sel imun (APC)."},
+{q:"IgE",a:"Imunoglobulin E → mediasi alergi tipe I. Memicu mast cell melepaskan histamin."},
+{q:"T½ (Waktu Paruh)",a:"Waktu yang diperlukan agar kadar obat dalam darah berkurang menjadi setengahnya."},
+{q:"Cmax",a:"Kadar puncak obat dalam darah setelah pemberian."},
+{q:"First Pass Metabolism",a:"Metabolisme obat di hati sebelum mencapai sirkulasi sistemik (khusus oral)."},
+{q:"APC",a:"Antigen Presenting Cell: makrofag, sel dendritik, sel B. Menampilkan antigen ke sel T."},
+{q:"CD4+ T cell",a:"Helper T cell → mengeluarkan sitokin untuk mengaktivasi sel imun lain."},
+{q:"CD8+ T cell",a:"Cytotoxic T cell → membunuh sel terinfeksi virus atau sel tumor."},
+{q:"Caseous Necrosis",a:"Nekrosis berwarna putih-keju, khas granuloma tuberkulosis."},
+{q:"Langhans Giant Cell",a:"Sel raksasa multinukleat dalam granuloma TB, nukleus berjajar di tepi."},
+{q:"Bioavailabilitas",a:"Fraksi obat utuh yang masuk ke sirkulasi sistemik setelah pemberian."},
+{q:"Steady State",a:"Kadar obat stabil saat kecepatan masuk = kecepatan keluar, tercapai dalam 4–5 × T½."},
+{q:"Cardinal Signs",a:"Rubor (merah), Tumor (bengkak), Calor (panas), Dolor (nyeri), Functio laesa (gangguan fungsi)."},
+{q:"Neoplasia",a:"Pertumbuhan baru yang abnormal dan autonomus; bisa jinak atau ganas."},
+{q:"Oncogene",a:"Gen hasil mutasi proto-oncogene yang mendorong proliferasi kanker."},
+{q:"TP53",a:"Tumor suppressor gene; Guardian of the Genome. Mengatur repair DNA dan apoptosis."},
+{q:"CYP450",a:"Cytochrome P450; enzim metabolisme fase I utama di hepar."},
+{q:"Sublingual",a:"Pemberian di bawah lidah → langsung ke vena cava superior → tanpa first pass."},
+{q:"Anafilaksis",a:"Reaksi alergi berat sistemik: IgE + allergen → mast cell → histamin → syok."}
+];
+
+/* ================= STATE ================= */
+let qi=0, qs=0, ei=0, es=0, et=1800, eto=null, fci=0;
+let pomoT=1500, pomoI=null, pomoS=parseInt(localStorage.getItem('pomoS')||'0');
+let studyT=parseInt(localStorage.getItem('studyT')||'0');
+
+/* ================= NAV ================= */
+function go(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(id==='dashboard') updDash();
+  if(id==='ujian' && ei===0 && !eto) startExamTimer();
+}
+
+/* ================= DASHBOARD ================= */
+function updDash(){
+  const qd=parseInt(localStorage.getItem('qd')||'0'), qc=parseInt(localStorage.getItem('qc')||'0');
+  const acc=qd?Math.round((qc/qd)*100):0;
+  document.getElementById('dQuiz').textContent=qd;
+  document.getElementById('dAcc').textContent=acc+'%';
+  document.getElementById('dFlash').textContent=Math.min(fci+1,fcs.length);
+  document.getElementById('dTime').textContent=Math.floor(studyT/60)+'m';
+}
+updDash();
+
+/* ================= MATERI ================= */
+function renMateri(){
+  const box=document.getElementById('box');
+  box.innerHTML=topics.map((t,i)=>`
+    <div class="glass topic" data-key="${(t.title+' '+t.cat+' '+t.simple).toLowerCase()}">
+      <div class="topic-head" onclick="tog(${i})">
+        <div><h3>${t.title}</h3><small>${t.cat}</small></div>
+        <span id="ic${i}">▼</span>
+      </div>
+      <div class="topic-body" id="bd${i}">
+        <div class="simple"><strong>💡 Bahasa Sederhana:</strong> ${t.simple}</div>
+        ${t.html}
+      </div>
+    </div>
+  `).join('');
+}
+function tog(i){
+  const b=document.getElementById('bd'+i), c=document.getElementById('ic'+i);
+  b.classList.toggle('open'); c.textContent=b.classList.contains('open')?'▲':'▼';
+}
+function doSearch(){
+  const v=document.getElementById('src').value.toLowerCase();
+  document.querySelectorAll('.topic').forEach(t=>t.style.display=t.dataset.key.includes(v)?'block':'none');
+}
+renMateri();
+
+/* ================= FLASHCARD ================= */
+function renFc(){
+  const c=fcs[fci];
+  document.getElementById('fcBox').innerHTML=`<div class="fc-scene" onclick="this.querySelector('.fc-card').classList.toggle('flip')">
+    <div class="fc-card glass">
+      <div class="fc-front glass"><div class="n">Kartu ${fci+1} dari ${fcs.length}</div><div class="q">${c.q}</div></div>
+      <div class="fc-back glass"><div class="a">${c.a}</div></div>
+    </div>
+  </div>`;
+  document.getElementById('fcCount').textContent=`${fci+1} / ${fcs.length}`;
+}
+function nextFc(){fci=(fci+1)%fcs.length;renFc();}
+renFc();
+
+/* ================= KUIS ================= */
+function renQuiz(){
+  if(qi>=quiz.length){
+    document.getElementById('qBox').innerHTML=`<div class="glass qz-result"><h2>🎉 Kuis Selesai!</h2><p>Skor: <b>${qs}</b> / ${quiz.length}</p><button class="btn btn-prim" onclick="resetQuiz()">Ulangi</button></div>`;
+    document.getElementById('qBar').style.width='100%';
+    localStorage.setItem('qd',(parseInt(localStorage.getItem('qd')||'0')+quiz.length)); localStorage.setItem('qc',(parseInt(localStorage.getItem('qc')||'0')+qs));
+    return;
+  }
+  const q=quiz[qi];
+  document.getElementById('qBar').style.width=((qi/quiz.length)*100)+'%';
+  document.getElementById('qBox').innerHTML=`<div class="glass qz-card">
+    <div class="qz-meta">Soal ${qi+1} dari ${quiz.length}</div>
+    <div class="qz-q">${q.q}</div>
+    ${q.o.map((opt,idx)=>`<div class="opt" id="qo${idx}" onclick="ansQ(${idx},${q.a})">${String.fromCharCode(65+idx)}. ${opt}</div>`).join('')}
+    <div class="expl" id="qx">${q.x}</div>
+    <div class="qz-nav"><span></span><button class="btn btn-prim" id="qn" style="display:none" onclick="nextQ()">Lanjut ➜</button></div>
+  </div>`;
+}
+function ansQ(sel,cor){
+  document.querySelectorAll('.opt').forEach((o,i)=>{o.style.pointerEvents='none';if(i===cor)o.classList.add('correct');});
+  if(sel!==cor) document.getElementById('qo'+sel).classList.add('wrong'); else qs++;
+  document.getElementById('qx').style.display='block';
+  document.getElementById('qn').style.display='inline-block';
+}
+function nextQ(){qi++;renQuiz();}
+function resetQuiz(){qi=0;qs=0;renQuiz();}
+renQuiz();
+
+/* ================= UJIAN ================= */
+function startExamTimer(){
+  eto=setInterval(()=>{
+    if(et<=0){clearInterval(eto);eto=null;alert('Waktu habis!');finishExam();return;}
+    et--;const m=Math.floor(et/60).toString().padStart(2,'0'),s=(et%60).toString().padStart(2,'0');
+    document.getElementById('eTimer').textContent=`${m}:${s}`;
+  },1000);
+}
+function renExam(){
+  if(ei>=exam.length){finishExam();return;}
+  const q=exam[ei];
+  document.getElementById('eBar').style.width=((ei/exam.length)*100)+'%';
+  document.getElementById('eBox').innerHTML=`<div class="glass qz-card">
+    <div class="qz-meta">Ujian Soal ${ei+1} / ${exam.length} • Sisa ${document.getElementById('eTimer').textContent}</div>
+    <div class="qz-q">${q.q}</div>
+    ${q.o.map((opt,idx)=>`<div class="opt" id="eo${idx}" onclick="ansE(${idx},${q.a})">${String.fromCharCode(65+idx)}. ${opt}</div>`).join('')}
+    <div class="expl" id="ex">${q.x}</div>
+    <div class="qz-nav"><span></span><button class="btn btn-prim" id="enext" style="display:none" onclick="nextE()">Lanjut ➜</button></div>
+  </div>`;
+}
+function ansE(sel,cor){
+  document.querySelectorAll('#eBox .opt').forEach((o,i)=>{o.style.pointerEvents='none';if(i===cor)o.classList.add('correct');});
+  if(sel!==cor) document.getElementById('eo'+sel).classList.add('wrong'); else es++;
+  document.getElementById('ex').style.display='block';
+  document.getElementById('enext').style.display='inline-block';
+}
+function nextE(){ei++;renExam();}
+function finishExam(){
+  if(eto){clearInterval(eto);eto=null;}
+  document.getElementById('eBox').innerHTML=`<div class="glass qz-result"><h2>🎓 Simulasi Ujian Selesai</h2><p>Benar: <b>${es}</b> / ${exam.length}<br>Waktu tersisa: ${document.getElementById('eTimer').textContent}</p><button class="btn btn-prim" onclick="resetExam()">Ulangi</button></div>`;
+  document.getElementById('eBar').style.width='100%';
+}
+function resetExam(){ei=0;es=0;et=1800;document.getElementById('eTimer').textContent='30:00';renExam();startExamTimer();}
+renExam();
+
+/* ================= POMODORO ================= */
+function setPomo(m,label){pausePomo();pomoT=m*60;upPomo();document.getElementById('pLabel').textContent='Waktu '+label;}
+function upPomo(){const m=Math.floor(pomoT/60).toString().padStart(2,'0'),s=(pomoT%60).toString().padStart(2,'0');document.getElementById('pTime').textContent=`${m}:${s}`;}
+function startPomo(){if(pomoI)return;pomoI=setInterval(()=>{if(pomoT>0){pomoT--;studyT++;localStorage.setItem('studyT',studyT);upPomo();}else{pausePomo();if(document.getElementById('pLabel').textContent.includes('Fokus')){pomoS++;localStorage.setItem('pomoS',pomoS);document.getElementById('pSess').textContent=pomoS;alert('Sesi fokus selesai! Istirahat sebentar.');}}},1000);}
+function pausePomo(){clearInterval(pomoI);pomoI=null;}
+function resetPomo(){pausePomo();setPomo(25,'Fokus');}
+document.getElementById('pSess').textContent=pomoS;
+upPomo();
+</script>
+</body>
+</html>
